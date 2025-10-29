@@ -1,0 +1,220 @@
+openapi: 3.0.0
+info:
+  title: Factura API
+  description: Documentación para los endpoints de gestión de facturas
+  version: 1.0.0
+
+paths:
+  /facturas:
+    post:
+      tags:
+        - Factura
+      summary: Crear factura
+      description: Crea una nueva factura en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFacturaDto'
+      responses:
+        '201':
+          description: Factura creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '400':
+          description: Datos inválidos
+
+    get:
+      tags:
+        - Factura
+      summary: Obtener todas las facturas
+      description: Devuelve una lista de todas las facturas registradas
+      responses:
+        '200':
+          description: Lista de facturas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Factura'
+
+  /facturas/{id}:
+    get:
+      tags:
+        - Factura
+      summary: Obtener factura por ID
+      description: Devuelve una factura específica según el ID proporcionado
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Factura encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '404':
+          description: Factura no encontrada
+
+    patch:
+      tags:
+        - Factura
+      summary: Actualizar factura
+      description: Actualiza los datos de una factura existente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFacturaDto'
+      responses:
+        '200':
+          description: Factura actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
+        '404':
+          description: Factura o proveedor no encontrado
+
+  /facturas/eliminar/{id}:
+    patch:
+      tags:
+        - Factura
+      summary: Eliminar (lógicamente) una factura
+      description: Cambia el estado de la factura a inactivo (`estado: false`)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Factura desactivada exitosamente
+        '404':
+          description: Factura no encontrada
+
+components:
+  schemas:
+    CreateFacturaDto:
+      type: object
+      required:
+        - tipo
+        - fecha
+        - subtotal
+        - total
+        - estado
+        - id_proveedor
+      properties:
+        tipo:
+          type: string
+          example: "Compra"
+        fecha:
+          type: string
+          format: date
+          example: "2025-08-04"
+        subtotal:
+          type: number
+          format: float
+          example: 1000.00
+        total:
+          type: number
+          format: float
+          example: 950.00
+        descuento:
+          type: number
+          format: float
+          example: 50.00
+        estado:
+          type: boolean
+          example: true
+        id_proveedor:
+          type: integer
+          example: 1
+
+    UpdateFacturaDto:
+      type: object
+      properties:
+        tipo:
+          type: string
+          example: "Venta"
+        fecha:
+          type: string
+          format: date
+          example: "2025-08-05"
+        subtotal:
+          type: number
+          format: float
+          example: 2000.00
+        total:
+          type: number
+          format: float
+          example: 1950.00
+        descuento:
+          type: number
+          format: float
+          example: 50.00
+        estado:
+          type: boolean
+          example: true
+        id_proveedor:
+          type: integer
+          example: 2
+
+    Factura:
+      type: object
+      properties:
+        id_factura:
+          type: integer
+          example: 1
+        tipo:
+          type: string
+          example: "Compra"
+        fecha:
+          type: string
+          format: date
+          example: "2025-08-04"
+        subtotal:
+          type: string
+          example: "1000.00"
+        total:
+          type: string
+          example: "950.00"
+        descuento:
+          type: string
+          example: "50.00"
+        estado:
+          type: boolean
+          example: true
+        proveedor:
+          type: object
+          properties:
+            id_proveedor:
+              type: integer
+              example: 1
+            nombre:
+              type: string
+              example: "Distribuidora Centroamericana"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-08-04T12:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-08-04T12:30:00Z"

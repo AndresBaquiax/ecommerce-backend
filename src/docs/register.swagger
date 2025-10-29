@@ -1,0 +1,218 @@
+openapi: 3.0.0
+info:
+  title: User Registration API
+  description: Documentación para el endpoint de registro de usuarios
+  version: 1.0.0
+  
+paths:
+  /usuarios/registro:
+    post:
+      tags:
+        - User Registration
+      summary: Registrar nuevo usuario
+      description: Crea un nuevo usuario en el sistema con los datos proporcionados
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nombre
+                - contrasena
+                - telefono
+                - correo
+                - id_rol
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre completo del usuario
+                  example: "Juan Pérez"
+                contrasena:
+                  type: string
+                  description: Contraseña del usuario (mínimo 6 caracteres)
+                  example: "miContrasena123"
+                  minLength: 6
+                telefono:
+                  type: string
+                  description: Número de teléfono del usuario
+                  example: "+502 1234-5678"
+                direccion:
+                  type: string
+                  description: Dirección del usuario (opcional)
+                  example: "Ciudad de Guatemala, Guatemala"
+                correo:
+                  type: string
+                  format: email
+                  description: Correo electrónico del usuario
+                  example: "usuario@example.com"
+                id_rol:
+                  type: number
+                  description: ID del rol asignado al usuario (1: Admin, 2: Cliente)
+                  example: 2
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_usuario:
+                    type: number
+                    description: ID único del usuario
+                    example: 1
+                  nombre:
+                    type: string
+                    description: Nombre del usuario
+                    example: "Juan Pérez"
+                  telefono:
+                    type: string
+                    description: Teléfono del usuario
+                    example: "+502 1234-5678"
+                  direccion:
+                    type: string
+                    description: Dirección del usuario
+                    example: "Ciudad de Guatemala, Guatemala"
+                  correo:
+                    type: string
+                    format: email
+                    description: Correo del usuario
+                    example: "usuario@example.com"
+                  estado:
+                    type: boolean
+                    description: Estado activo del usuario
+                    example: true
+                  fechaCreacion:
+                    type: string
+                    format: date-time
+                    description: Fecha de creación del usuario
+                    example: "2025-01-26T12:00:00Z"
+                  id_rol:
+                    type: number
+                    description: ID del rol del usuario
+                    example: 2
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: Timestamp de creación del registro
+                    example: "2025-01-26T12:00:00Z"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    description: Timestamp de última actualización
+                    example: "2025-01-26T12:00:00Z"
+        '409':
+          description: El correo ya está registrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 409
+                  message:
+                    type: string
+                    example: "El correo ya está registrado"
+                  error:
+                    type: string
+                    example: "Conflict"
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: array
+                    items:
+                      type: string
+                    example: [
+                      "nombre should not be empty",
+                      "contrasena must be longer than or equal to 6 characters",
+                      "correo must be an email"
+                    ]
+                  error:
+                    type: string
+                    example: "Bad Request"
+
+components:
+  schemas:
+    CreateUsuarioDto:
+      type: object
+      required:
+        - nombre
+        - contrasena
+        - telefono
+        - correo
+        - id_rol
+      properties:
+        nombre:
+          type: string
+          description: Nombre completo del usuario
+          example: "Juan Pérez"
+        contrasena:
+          type: string
+          description: Contraseña del usuario (mínimo 6 caracteres)
+          example: "miContrasena123"
+          minLength: 6
+        telefono:
+          type: string
+          description: Número de teléfono del usuario
+          example: "+502 1234-5678"
+        direccion:
+          type: string
+          description: Dirección del usuario (opcional)
+          example: "Ciudad de Guatemala, Guatemala"
+        correo:
+          type: string
+          format: email
+          description: Correo electrónico del usuario
+          example: "usuario@example.com"
+        id_rol:
+          type: number
+          description: ID del rol asignado al usuario (1: Admin, 2: Cliente)
+          example: 2
+    
+    RegisterUsuario:
+      type: object
+      properties:
+        id_usuario:
+          type: number
+          description: ID único del usuario
+        nombre:
+          type: string
+          description: Nombre del usuario
+        telefono:
+          type: string
+          description: Teléfono del usuario
+        direccion:
+          type: string
+          description: Dirección del usuario
+        correo:
+          type: string
+          format: email
+          description: Correo del usuario
+        estado:
+          type: boolean
+          description: Estado activo del usuario
+        fechaCreacion:
+          type: string
+          format: date-time
+          description: Fecha de creación del usuario
+        id_rol:
+          type: number
+          description: ID del rol del usuario
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp de creación del registro
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp de última actualización

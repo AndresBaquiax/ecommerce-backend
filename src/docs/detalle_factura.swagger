@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  title: API Detalle Factura
+  version: 1.0.0
+  description: Endpoints relacionados con los detalles de factura
+
+paths:
+  /detalles-factura:
+    post:
+      summary: Crear detalle de factura
+      tags:
+        - Detalle Factura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDetalleFacturaDto'
+            example:
+              cantidad: 3
+              precio_unitario: 45.50
+              id_factura: 1
+              id_inventario: 2
+              id_lote: 5
+      responses:
+        '201':
+          description: Detalle de factura creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetalleFactura'
+
+    get:
+      summary: Obtener todos los detalles de factura
+      tags:
+        - Detalle Factura
+      responses:
+        '200':
+          description: Lista de detalles de factura obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DetalleFactura'
+
+  /detalles-factura/{id}:
+    get:
+      summary: Obtener detalle de factura por ID
+      tags:
+        - Detalle Factura
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID del detalle de factura
+      responses:
+        '200':
+          description: Detalle de factura encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetalleFactura'
+        '404':
+          description: Detalle de factura no encontrado
+
+    patch:
+      summary: Actualizar detalle de factura
+      tags:
+        - Detalle Factura
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID del detalle de factura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDetalleFacturaDto'
+            example:
+              cantidad: 4
+              precio_unitario: 50.75
+      responses:
+        '200':
+          description: Detalle de factura actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetalleFactura'
+        '404':
+          description: Detalle de factura no encontrado
+
+    delete:
+      summary: Eliminar detalle de factura
+      tags:
+        - Detalle Factura
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: ID del detalle de factura
+      responses:
+        '200':
+          description: Detalle de factura eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                    example: Detalle de factura eliminado exitosamente
+        '404':
+          description: Detalle de factura no encontrado
+
+components:
+  schemas:
+    CreateDetalleFacturaDto:
+      type: object
+      required:
+        - cantidad
+        - precio_unitario
+        - id_factura
+        - id_inventario
+        - id_lote
+      properties:
+        cantidad:
+          type: integer
+          example: 3
+        precio_unitario:
+          type: number
+          format: float
+          example: 45.50
+        id_factura:
+          type: integer
+          example: 1
+        id_inventario:
+          type: integer
+          example: 2
+        id_lote:
+          type: integer
+          example: 5
+
+    UpdateDetalleFacturaDto:
+      type: object
+      properties:
+        cantidad:
+          type: integer
+          example: 4
+        precio_unitario:
+          type: number
+          format: float
+          example: 50.75
+        id_factura:
+          type: integer
+          example: 1
+        id_inventario:
+          type: integer
+          example: 2
+        id_lote:
+          type: integer
+          example: 5
+
+    DetalleFactura:
+      type: object
+      properties:
+        id_detalle:
+          type: integer
+          example: 1
+        cantidad:
+          type: integer
+          example: 5
+        precio_unitario:
+          type: number
+          format: float
+          example: 49.99
+        factura:
+          type: object
+          properties:
+            id_factura:
+              type: integer
+              example: 1
+        inventario:
+          type: object
+          properties:
+            id_inventario:
+              type: integer
+              example: 2
+        lote:
+          type: object
+          properties:
+            id_lote:
+              type: integer
+              example: 5
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time

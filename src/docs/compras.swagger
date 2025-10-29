@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: API Compras
+  version: 1.0.0
+  description: Endpoints para registrar compras
+
+paths:
+  /compras:
+    post:
+      tags:
+        - Compras
+      summary: Registrar compra
+      description: Registra una compra con detalles de productos, creando factura, lotes, asignaciones y actualizando inventario.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrarCompraDto'
+            example:
+              tipo: "Compra"
+              fecha: "2025-08-04"
+              subtotal: 1000.00
+              total: 950.00
+              descuento: 50.00
+              id_proveedor: 2
+              detalleProductos:
+                - id_inventario: 1
+                  cantidad: 10
+                  precio_unitario: 100.00
+                  fecha_vencimiento: "2026-01-01"
+                - id_inventario: 2
+                  cantidad: 5
+                  precio_unitario: 120.00
+                  fecha_vencimiento: "2026-06-01"
+      responses:
+        '201':
+          description: Compra registrada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                    example: Compra registrada exitosamente
+        '400':
+          description: Datos inválidos
+        '500':
+          description: Error interno del servidor
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ProductoCompraDto:
+      type: object
+      required:
+        - id_inventario
+        - cantidad
+        - precio_unitario
+        - fecha_vencimiento
+      properties:
+        id_inventario:
+          type: integer
+          example: 1
+        cantidad:
+          type: number
+          example: 10
+        precio_unitario:
+          type: number
+          format: float
+          example: 100.00
+        fecha_vencimiento:
+          type: string
+          format: date
+          example: "2026-01-01"
+
+    RegistrarCompraDto:
+      type: object
+      required:
+        - tipo
+        - fecha
+        - subtotal
+        - total
+        - id_proveedor
+        - detalleProductos
+      properties:
+        tipo:
+          type: string
+          example: "Compra"
+        fecha:
+          type: string
+          format: date
+          example: "2025-08-04"
+        subtotal:
+          type: number
+          format: float
+          example: 1000.00
+        total:
+          type: number
+          format: float
+          example: 950.00
+        descuento:
+          type: number
+          format: float
+          example: 50.00
+        id_proveedor:
+          type: integer
+          example: 2
+        detalleProductos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductoCompraDto'

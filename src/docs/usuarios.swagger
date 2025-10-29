@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: Usuarios-Factura API
+  description: Documentación para los endpoints que gestionan la relación entre usuarios y facturas (tabla usuarios)
+  version: 1.0.0
+
+paths:
+  /usuarios-factura:
+    post:
+      tags:
+        - UsuariosFactura
+      summary: Crear relación usuario-factura
+      description: Crea una relación entre un usuario y una factura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUsuariosDto'
+      responses:
+        '201':
+          description: Relación creada exitosamente
+        '400':
+          description: Datos inválidos
+
+    get:
+      tags:
+        - UsuariosFactura
+      summary: Obtener todas las relaciones
+      description: Devuelve todas las relaciones entre usuarios y facturas
+      responses:
+        '200':
+          description: Lista de relaciones
+
+  /usuarios-factura/{id}:
+    get:
+      tags:
+        - UsuariosFactura
+      summary: Obtener relación por ID
+      description: Devuelve una relación usuario-factura por su ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Relación encontrada
+        '404':
+          description: Relación no encontrada
+
+    patch:
+      tags:
+        - UsuariosFactura
+      summary: Actualizar relación usuario-factura
+      description: Actualiza la relación entre un usuario y una factura
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUsuariosDto'
+      responses:
+        '200':
+          description: Relación actualizada
+        '404':
+          description: Relación no encontrada
+
+    delete:
+      tags:
+        - UsuariosFactura
+      summary: Eliminar relación usuario-factura
+      description: Elimina físicamente una relación entre usuario y factura
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Relación eliminada
+        '404':
+          description: Relación no encontrada
+
+components:
+  schemas:
+    CreateUsuariosDto:
+      type: object
+      required:
+        - id_usuario
+        - id_factura
+      properties:
+        id_usuario:
+          type: integer
+          example: 2
+        id_factura:
+          type: integer
+          example: 5
+
+    UpdateUsuariosDto:
+      type: object
+      properties:
+        id_usuario:
+          type: integer
+          example: 3
+        id_factura:
+          type: integer
+          example: 6
