@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Rol } from '../rol/rol.entity';
 import { Usuarios } from 'src/usuarios/usuarios.entity';
+import { Logs } from 'src/logs/logs.entity';
 
 @Entity('usuario')
 export class Usuario {
@@ -41,4 +42,7 @@ export class Usuario {
 
   @OneToMany(() => Usuarios, (rel) => rel.usuario)
   usuarios: Usuarios[];
+
+  @OneToMany(() => Logs, (rel) => rel.id_log)
+  logs: Logs[];
 }
