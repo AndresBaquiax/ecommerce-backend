@@ -157,3 +157,12 @@ CREATE TABLE direccion (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tabla: Logs
+CREATE TABLE logs (
+    id_log SERIAL PRIMARY KEY,
+    accion TEXT NOT NULL,
+    id_usuario INTEGER NOT NULL REFERENCES usuario(id_usuario)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

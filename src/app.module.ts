@@ -41,6 +41,8 @@ import { Pedido } from './pedidos/pedido.entity';
 import { Departamento } from './departamentos/departamento.entity';
 import { RolModule } from './rol/rol.module';
 import { ReportesModule } from './reportes/reportes.module';
+import { Logs } from './logs/logs.entity';
+import { LogsModule } from './logs/logs.module';
 
 @Module({
   imports: [
@@ -74,7 +76,8 @@ import { ReportesModule } from './reportes/reportes.module';
           AsignacionLotes,
           Direccion,
           Pedido,
-          Departamento
+          Departamento,
+          Logs
         ],
         synchronize: false,
       }),
@@ -98,7 +101,8 @@ import { ReportesModule } from './reportes/reportes.module';
     StockModule,
     DepartamentoModule,
     RolModule,
-    ReportesModule 
+    ReportesModule,
+    LogsModule,
   ],
 })
 export class AppModule {}
