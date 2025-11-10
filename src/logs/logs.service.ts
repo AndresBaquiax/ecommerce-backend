@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,6 +25,14 @@ export class LogsService {
 
   findAll() {
     return this.logsRepo.find();
+  }
+
+  async findAllByUserId(userId: number) {
+    const user = await this.usuarioRepo.findOne({ where: { id_usuario: userId }, relations: ['rol'] });
+    if (!user) {
+      return [];
+    }
+    return this.logsRepo.find({ where: { usuario: user } });
   }
 
   findOne(id: number) {

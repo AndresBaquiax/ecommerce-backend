@@ -19,6 +19,11 @@ export class LogsController {
     return this.logsService.findAll();
   }
 
+  @Get('user/:id')
+  finAllByUserId(@Param('id') id: number) {
+    return this.logsService.findAllByUserId(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.logsService.findOne(+id);
