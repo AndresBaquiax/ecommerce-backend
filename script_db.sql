@@ -166,3 +166,82 @@ CREATE TABLE logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ------------------------------------------------------------------
+-- Tablas para estado de cliente (lookup + per-usuario)
+-- No modifican la tabla `usuario`; enlazan con ella por FK
+-- ------------------------------------------------------------------
+
+-- Tabla lookup con los tipos/estados de cliente
+CREATE TABLE IF NOT EXISTS public.estado_cliente_tipo (
+        id smallint PRIMARY KEY,
+        nombre text NOT NULL,
+        descripcion text
+);
+
+-- Insertar/actualizar los estados conocidos
+INSERT INTO public.estado_cliente_tipo (id, nombre, descripcion)
+VALUES
+    (0, 'Inactivo', 'Usuario desactivado'),
+    (1, 'Activo', 'Usuario activo (uso administrativo/general)'),
+    (2, 'Posible', 'Usuario que creó cuenta (nuevo)'),
+    (3, 'Potencial', 'Usuario que realizó al menos una compra'),
+    (4, 'Fidelizado', 'Usuario con 4 o más compras')
+ON CONFLICT (id) DO UPDATE SET nombre = EXCLUDED.nombre, descripcion = EXCLUDED.descripcion;
+
+-- Tabla por-usuario que referencia al lookup
+CREATE TABLE IF NOT EXISTS public.estado_cliente (
+    id SERIAL PRIMARY KEY,
+    id_usuario integer NOT NULL UNIQUE,
+    tipo smallint NOT NULL DEFAULT 2,
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Intentar crear constraints FK (mejor esfuerzo: si fallan por permisos se ignorarán)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace
+        WHERE c.conname = 'fk_estado_cliente_usuario'
+    ) THEN
+        BEGIN
+            ALTER TABLE public.estado_cliente
+                ADD CONSTRAINT fk_estado_cliente_usuario FOREIGN KEY (id_usuario) REFERENCES public.usuario(id_usuario) ON DELETE CASCADE;
+        EXCEPTION WHEN OTHERS THEN
+            RAISE NOTICE 'Could not add FK fk_estado_cliente_usuario: %', SQLERRM;
+        END;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace
+        WHERE c.conname = 'fk_estado_cliente_tipo'
+    ) THEN
+        BEGIN
+            ALTER TABLE public.estado_cliente
+                ADD CONSTRAINT fk_estado_cliente_tipo FOREIGN KEY (tipo) REFERENCES public.estado_cliente_tipo(id) ON DELETE RESTRICT;
+        EXCEPTION WHEN OTHERS THEN
+            RAISE NOTICE 'Could not add FK fk_estado_cliente_tipo: %', SQLERRM;
+        END;
+    END IF;
+END
+$$;
+
+-- Poblar estado_cliente a partir de usuario sin modificar la tabla usuario
+INSERT INTO public.estado_cliente (id_usuario, tipo, updated_at)
+SELECT u.id_usuario,
+             CASE WHEN pg_typeof(u.estado) = 'boolean'::regtype THEN (CASE WHEN u.estado THEN 2 ELSE 0 END) ELSE u.estado END,
+             now()
+FROM public.usuario u
+WHERE NOT EXISTS (SELECT 1 FROM public.estado_cliente ec WHERE ec.id_usuario = u.id_usuario);
+
+-- Sincronizar diferencias (mantener la tabla por-usuario alineada)
+UPDATE public.estado_cliente ec
+SET tipo = src.usuario_tipo, updated_at = now()
+FROM (
+    SELECT u.id_usuario,
+                 CASE WHEN pg_typeof(u.estado) = 'boolean'::regtype THEN (CASE WHEN u.estado THEN 2 ELSE 0 END) ELSE u.estado END AS usuario_tipo
+    FROM public.usuario u
+) AS src
+WHERE ec.id_usuario = src.id_usuario
+    AND ec.tipo IS DISTINCT FROM src.usuario_tipo;
+

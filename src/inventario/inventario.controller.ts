@@ -14,7 +14,7 @@ import { InventarioService } from './inventario.service';
 import { CreateInventarioDto } from './dto/crear-inventario.dto';
 import { UpdateInventarioDto } from './dto/actualizar-inventario.dto';
 
-@UseGuards(JwtAuthGuard)
+
 @Controller('inventario')
 export class InventarioController {
   constructor(private readonly service: InventarioService) {}
