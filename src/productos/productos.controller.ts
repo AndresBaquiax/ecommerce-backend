@@ -21,23 +21,66 @@ import { UpdateProductoDto } from './dto/update-producto.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { multerConfig } from './multer.config';
 
+import { GoogleDriveService } from './google-drive.service';
+
 @ApiTags('Productos')
 @Controller('productos')
 export class ProductosController {
-  constructor(private readonly productosService: ProductosService) {}
+  constructor(
+    private readonly productosService: ProductosService,
+    private readonly googleDriveService: GoogleDriveService,
+  ) {}
 
   private buildFullImageUrl(req: Request, url_imagen: string): string {
     if (!url_imagen) return '';
     
-    // Si ya es una URL completa (http/https), devolverla tal como está
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const baseUrl = `${protocol}://${host}`;
+    
+    // Si es URL de lh3.googleusercontent.com, usar proxy
+    if (url_imagen.includes('lh3.googleusercontent.com/d/')) {
+      const fileIdMatch = url_imagen.match(/\/d\/([^=\/]+)/);
+      if (fileIdMatch && fileIdMatch[1]) {
+        const fileId = fileIdMatch[1];
+        return `${baseUrl}/image-proxy?fileId=${fileId}`;
+      }
+    }
+    
+    // Si es una URL de Google Drive, extraer ID y usar proxy
+    if (url_imagen.startsWith('https://drive.google.com/file/d/')) {
+      const fileIdMatch = url_imagen.match(/\/file\/d\/([^\/]+)/);
+      if (fileIdMatch && fileIdMatch[1]) {
+        const fileId = fileIdMatch[1];
+        return `${baseUrl}/image-proxy?fileId=${fileId}`;
+      }
+    }
+    
+    // Si es formato thumbnail, extraer ID y usar proxy
+    if (url_imagen.includes('drive.google.com/thumbnail')) {
+      const fileIdMatch = url_imagen.match(/[?&]id=([^&]+)/);
+      if (fileIdMatch && fileIdMatch[1]) {
+        const fileId = fileIdMatch[1];
+        return `${baseUrl}/image-proxy?fileId=${fileId}`;
+      }
+    }
+    
+    // Si es formato uc?, extraer ID y usar proxy
+    if (url_imagen.includes('drive.google.com/uc?')) {
+      const fileIdMatch = url_imagen.match(/[?&]id=([^&]+)/);
+      if (fileIdMatch && fileIdMatch[1]) {
+        const fileId = fileIdMatch[1];
+        return `${baseUrl}/image-proxy?fileId=${fileId}`;
+      }
+    }
+    
+    // Si es una ruta relativa o URL completa de otro origen, devolverla tal cual
     if (url_imagen.startsWith('http://') || url_imagen.startsWith('https://')) {
       return url_imagen;
     }
     
-    // Si es una ruta relativa, construir la URL completa
-    const protocol = req.protocol;
-    const host = req.get('host');
-    return `${protocol}://${host}${url_imagen}`;
+    // Si es una ruta relativa del backend
+    return `${baseUrl}${url_imagen}`;
   }
 
   // ======================
@@ -70,7 +113,13 @@ export class ProductosController {
     @UploadedFile() imagen?: Express.Multer.File
   ) {
     if (imagen) {
-      createProductoDto.url_imagen = `/images/${imagen.filename}`;
+      // Subir la imagen a Google Drive y guardar el enlace
+      const url = await this.googleDriveService.uploadFile(
+        imagen.originalname,
+        imagen.mimetype,
+        imagen.buffer
+      );
+      createProductoDto.url_imagen = url;
     }
     return this.productosService.create(createProductoDto);
   }
@@ -123,12 +172,29 @@ export class ProductosController {
   async update(
     @Param('id', ParseIntPipe) id: number, 
     @Body() updateProductoDto: UpdateProductoDto,
-    @UploadedFile() imagen?: Express.Multer.File
+    @UploadedFile() imagen?: Express.Multer.File,
+    @Req() req?: Request
   ) {
     if (imagen) {
-      updateProductoDto.url_imagen = `/images/${imagen.filename}`;
+      // Subir la imagen a Google Drive y guardar el enlace
+      const url = await this.googleDriveService.uploadFile(
+        imagen.originalname,
+        imagen.mimetype,
+        imagen.buffer
+      );
+      updateProductoDto.url_imagen = url;
     }
-    return this.productosService.update(id, updateProductoDto);
+    const productoActualizado = await this.productosService.update(id, updateProductoDto);
+    
+    // Transformar la URL de la imagen para el response si hay request
+    if (req) {
+      return {
+        ...productoActualizado,
+        url_imagen: this.buildFullImageUrl(req, productoActualizado.url_imagen)
+      };
+    }
+    
+    return productoActualizado;
   }
 
   // ======================
