@@ -166,3 +166,15 @@ CREATE TABLE logs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tabla: Oferta
+CREATE TABLE oferta (
+    id_oferta SERIAL PRIMARY KEY,
+    descripcion TEXT,
+    descuento_porcentaje NUMERIC(5,2),
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    id_producto INTEGER NOT NULL REFERENCES producto(id_producto),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
