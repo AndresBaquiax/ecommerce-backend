@@ -44,6 +44,7 @@ import { Departamento } from './departamentos/departamento.entity';
 import { RolModule } from './rol/rol.module';
 import { ReportesModule } from './reportes/reportes.module';
 import { Logs } from './logs/logs.entity';
+import { EstadoCliente } from './estado-cliente/estado-cliente.entity';
 import { LogsModule } from './logs/logs.module';
 
 @Module({
@@ -80,7 +81,8 @@ import { LogsModule } from './logs/logs.module';
           Direccion,
           Pedido,
           Departamento,
-          Logs
+          Logs,
+          EstadoCliente
         ],
         synchronize: false,
       }),

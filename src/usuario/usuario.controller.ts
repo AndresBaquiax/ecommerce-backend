@@ -8,8 +8,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/actualizar-usuario.dto';
 
 @ApiTags('Usuarios')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+
 @Controller('usuario')
 export class UsuarioController {
   constructor(private readonly service: UsuariosService) {}

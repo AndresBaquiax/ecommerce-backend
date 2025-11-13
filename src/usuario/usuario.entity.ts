@@ -4,11 +4,13 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  OneToMany
+  OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Rol } from '../rol/rol.entity';
 import { Usuarios } from 'src/usuarios/usuarios.entity';
 import { Logs } from 'src/logs/logs.entity';
+import { EstadoCliente } from 'src/estado-cliente/estado-cliente.entity';
 
 @Entity('usuario')
 export class Usuario {
@@ -30,7 +32,10 @@ export class Usuario {
   @Column()
   correo: string;
 
-  @Column()
+  @Column({ type: 'smallint', default: 2 })
+  // DB currently stores this column as boolean (legacy schema). Keep entity in sync with DB
+  // and map numeric states at service layer.
+  @Column({ type: 'boolean', default: true })
   estado: boolean;
 
   @Column()
@@ -45,4 +50,7 @@ export class Usuario {
 
   @OneToMany(() => Logs, (rel) => rel.id_log)
   logs: Logs[];
+
+  @OneToOne(() => EstadoCliente, (ec) => ec.usuario, { cascade: false, eager: true })
+  estadoCliente?: EstadoCliente;
 }
