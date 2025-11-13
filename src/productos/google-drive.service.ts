@@ -17,15 +17,22 @@ export class GoogleDriveService {
       process.env.GOOGLE_DRIVE_REDIRECT_URI
     );
 
-    // Cargar tokens desde tokens.json
-    const tokenPath = path.join(process.cwd(), 'tokens.json');
-    if (fs.existsSync(tokenPath)) {
-      const tokens = JSON.parse(fs.readFileSync(tokenPath, 'utf-8'));
-      this.oauth2Client.setCredentials(tokens);
+    // Cargar tokens desde variable de entorno o archivo local
+    let tokens;
+    if (process.env.GOOGLE_DRIVE_TOKENS) {
+      // En producción (Render), usar variable de entorno
+      tokens = JSON.parse(process.env.GOOGLE_DRIVE_TOKENS);
     } else {
-      throw new Error('No se encontró el archivo tokens.json. Ejecuta el flujo de autenticación OAuth primero.');
+      // En desarrollo, usar archivo local
+      const tokenPath = path.join(process.cwd(), 'tokens.json');
+      if (fs.existsSync(tokenPath)) {
+        tokens = JSON.parse(fs.readFileSync(tokenPath, 'utf-8'));
+      } else {
+        throw new Error('No se encontró el archivo tokens.json ni la variable GOOGLE_DRIVE_TOKENS');
+      }
     }
-
+    
+    this.oauth2Client.setCredentials(tokens);
     this.drive = google.drive({ version: 'v3', auth: this.oauth2Client });
   }
 
