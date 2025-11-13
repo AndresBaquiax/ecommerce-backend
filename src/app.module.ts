@@ -21,6 +21,7 @@ import { DireccionModule } from './direcciones/direccion.module';
 import { ComprasModule } from './compras/compras.module';
 import { StockModule } from './stock/stock.module';
 import { DepartamentoModule } from './departamentos/departamento.module';
+import { OfertasModule } from './ofertas/ofertas.module';
 
 // Entidades
 import { Usuario } from './usuario/usuario.entity';
@@ -35,6 +36,7 @@ import { Factura } from './factura/factura.entity';
 import { DetalleFactura } from './detalle_factura/detalle_factura.entity';
 import { Inventario } from './inventario/inventario.entity';
 import { Categoria } from './categorias/categoria.entity';
+import { Oferta } from './ofertas/oferta.entity';
 import { VentasModule } from './ventas/ventas.module';
 import { Direccion } from './direcciones/direccion.entity';
 import { Pedido } from './pedidos/pedido.entity';
@@ -74,6 +76,7 @@ import { LogsModule } from './logs/logs.module';
           Lotes,
           Producto,
           Categoria,
+          Oferta,
           AsignacionLotes,
           Direccion,
           Pedido,
@@ -105,6 +108,7 @@ import { LogsModule } from './logs/logs.module';
     RolModule,
     ReportesModule,
     LogsModule,
+    OfertasModule,
   ],
 })
 export class AppModule {}
