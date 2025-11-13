@@ -43,6 +43,10 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# Google OAuth credentials and tokens (sensitive data)
+tokens.json
+credenciales.json
+
 # temp directory
 .temp
 .tmp
