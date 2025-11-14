@@ -27,10 +27,6 @@ export class Devolucion {
   @JoinColumn({ name: 'id_usuario'})
   usuario: Usuario;
 
-  @ManyToOne(() => DetalleFactura)
-  @JoinColumn({ name: 'id_detalle'})
-  detalle?: DetalleFactura | null;
-
   @ManyToOne(() => Inventario)
   @JoinColumn({ name: 'id_inventario'})
   inventario?: Inventario | null;
@@ -40,12 +36,6 @@ export class Devolucion {
 
   @Column()
   motivo: string;
-
-  @Column()
-  fecha_solicitud: Date;
-
-  @Column()
-  fecha_resolucion?: Date;
 
   @Column()
   monto_reembolsado: string;

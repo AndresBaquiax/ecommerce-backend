@@ -14,10 +14,6 @@ export class UpdateDevolucionDto {
 
   @IsOptional()
   @IsInt()
-  id_detalle?: number;
-
-  @IsOptional()
-  @IsInt()
   id_inventario?: number;
 
   @IsOptional()
@@ -28,9 +24,6 @@ export class UpdateDevolucionDto {
   @IsOptional()
   @IsString()
   motivo?: string;
-
-  @IsOptional()
-  fecha_resolucion?: Date;
 
   @IsOptional()
   @IsNumber()

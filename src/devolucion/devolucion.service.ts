@@ -31,12 +31,6 @@ export class DevolucionService {
     const usuario = await this.usuarioRepo.findOne({ where: { id_usuario: dto.id_usuario } });
     if (!usuario) throw new NotFoundException('Usuario no encontrado');
 
-    let detalle: DetalleFactura | null = null;
-    if (dto.id_detalle) {
-      detalle = await this.detalleRepo.findOne({ where: { id_detalle: dto.id_detalle } });
-      if (!detalle) throw new NotFoundException('Detalle de factura no encontrado');
-    }
-
     let inventario: Inventario | null = null;
     if (dto.id_inventario) {
       inventario = await this.inventarioRepo.findOne({ where: { id_inventario: dto.id_inventario } });
@@ -46,11 +40,9 @@ export class DevolucionService {
     const devolucion = this.devolucionRepo.create({
       pedido,
       usuario,
-      detalle,
       inventario,
       cantidad: dto.cantidad,
       motivo: dto.motivo,
-      fecha_resolucion: dto.fecha_resolucion ? (dto.fecha_resolucion as any) : null,
       monto_reembolsado: dto.monto_reembolsado != null ? dto.monto_reembolsado.toFixed(2) : '0',
     });
 
@@ -92,10 +84,7 @@ export class DevolucionService {
       dev.usuario = usuario;
     }
 
-    if (dto.id_detalle !== undefined) {
-      dev.detalle = dto.id_detalle ? await this.detalleRepo.findOne({ where: { id_detalle: dto.id_detalle } }) : null;
-      if (dto.id_detalle && !dev.detalle) throw new NotFoundException('Detalle de factura no encontrado');
-    }
+
 
     if (dto.id_inventario !== undefined) {
       dev.inventario = dto.id_inventario ? await this.inventarioRepo.findOne({ where: { id_inventario: dto.id_inventario } }) : null;
@@ -104,7 +93,6 @@ export class DevolucionService {
 
     if (dto.cantidad !== undefined) dev.cantidad = dto.cantidad;
     if (dto.motivo !== undefined) dev.motivo = dto.motivo;
-    if (dto.fecha_resolucion !== undefined) dev.fecha_resolucion = dto.fecha_resolucion as any;
     if (dto.monto_reembolsado !== undefined) dev.monto_reembolsado = dto.monto_reembolsado.toFixed(2);
 
     return this.devolucionRepo.save(dev);

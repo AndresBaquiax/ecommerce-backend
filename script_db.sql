@@ -262,12 +262,9 @@ CREATE TABLE devolucion (
     id_devolucion SERIAL PRIMARY KEY,
     id_pedido INTEGER NOT NULL REFERENCES pedido(id_pedido),
     id_usuario INTEGER NOT NULL REFERENCES usuario(id_usuario),
-    id_detalle INTEGER NULL REFERENCES detalle_factura(id_detalle),
     id_inventario INTEGER NULL REFERENCES inventario(id_inventario),
     cantidad INTEGER NOT NULL CHECK (cantidad > 0),
     motivo TEXT NOT NULL,
-    fecha_solicitud TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fecha_resolucion TIMESTAMP NULL,
     monto_reembolsado NUMERIC(12,2) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

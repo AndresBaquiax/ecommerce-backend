@@ -9,10 +9,6 @@ export class CreateDevolucionDto {
 
   @IsOptional()
   @IsInt()
-  id_detalle?: number;
-
-  @IsOptional()
-  @IsInt()
   id_inventario?: number;
 
   @IsInt()
@@ -26,7 +22,4 @@ export class CreateDevolucionDto {
   @IsOptional()
   @IsNumber()
   monto_reembolsado?: number;
-
-  @IsOptional()
-  fecha_resolucion?: Date;
 }
