@@ -46,6 +46,8 @@ import { ReportesModule } from './reportes/reportes.module';
 import { Logs } from './logs/logs.entity';
 import { EstadoCliente } from './estado-cliente/estado-cliente.entity';
 import { LogsModule } from './logs/logs.module';
+import { DevolucionModule } from './devolucion/devolucion.module';
+import { Devolucion } from './devolucion/entities/devolucion.entity';
 
 @Module({
   imports: [
@@ -82,7 +84,8 @@ import { LogsModule } from './logs/logs.module';
           Pedido,
           Departamento,
           Logs,
-          EstadoCliente
+          EstadoCliente,
+          Devolucion
         ],
         synchronize: false,
       }),
@@ -109,6 +112,7 @@ import { LogsModule } from './logs/logs.module';
     ReportesModule,
     LogsModule,
     OfertasModule,
+    DevolucionModule,
   ],
 })
 export class AppModule {}
