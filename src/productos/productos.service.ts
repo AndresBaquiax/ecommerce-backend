@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GoogleDriveService } from './google-drive.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Producto } from './productos.entity';
@@ -14,7 +13,6 @@ export class ProductosService {
     private productosRepository: Repository<Producto>,
     @InjectRepository(Oferta)
     private ofertasRepository: Repository<Oferta>,
-    private readonly googleDriveService?: GoogleDriveService,
   ) {}
 
   async create(createProductoDto: CreateProductoDto): Promise<Producto> {

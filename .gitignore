@@ -47,6 +47,9 @@ lerna-debug.log*
 tokens.json
 credenciales.json
 
+# Upload files (imágenes locales)
+/uploads/
+
 # temp directory
 .temp
 .tmp

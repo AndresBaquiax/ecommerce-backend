@@ -20,15 +20,14 @@ import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { multerConfig } from './multer.config';
-
-import { GoogleDriveService } from './google-drive.service';
+import { LocalStorageService } from './local-storage.service';
 
 @ApiTags('Productos')
 @Controller('productos')
 export class ProductosController {
   constructor(
     private readonly productosService: ProductosService,
-    private readonly googleDriveService: GoogleDriveService,
+    private readonly localStorageService: LocalStorageService,
   ) {}
 
   private buildFullImageUrl(req: Request, url_imagen: string): string {
@@ -38,43 +37,12 @@ export class ProductosController {
     const host = req.get('host');
     const baseUrl = `${protocol}://${host}`;
     
-    // Si es URL de lh3.googleusercontent.com, usar proxy
-    if (url_imagen.includes('lh3.googleusercontent.com/d/')) {
-      const fileIdMatch = url_imagen.match(/\/d\/([^=\/]+)/);
-      if (fileIdMatch && fileIdMatch[1]) {
-        const fileId = fileIdMatch[1];
-        return `${baseUrl}/image-proxy?fileId=${fileId}`;
-      }
+    // Si ya es una URL completa local (/uploads/...), devolverla con base URL
+    if (url_imagen.startsWith('/uploads/')) {
+      return `${baseUrl}${url_imagen}`;
     }
     
-    // Si es una URL de Google Drive, extraer ID y usar proxy
-    if (url_imagen.startsWith('https://drive.google.com/file/d/')) {
-      const fileIdMatch = url_imagen.match(/\/file\/d\/([^\/]+)/);
-      if (fileIdMatch && fileIdMatch[1]) {
-        const fileId = fileIdMatch[1];
-        return `${baseUrl}/image-proxy?fileId=${fileId}`;
-      }
-    }
-    
-    // Si es formato thumbnail, extraer ID y usar proxy
-    if (url_imagen.includes('drive.google.com/thumbnail')) {
-      const fileIdMatch = url_imagen.match(/[?&]id=([^&]+)/);
-      if (fileIdMatch && fileIdMatch[1]) {
-        const fileId = fileIdMatch[1];
-        return `${baseUrl}/image-proxy?fileId=${fileId}`;
-      }
-    }
-    
-    // Si es formato uc?, extraer ID y usar proxy
-    if (url_imagen.includes('drive.google.com/uc?')) {
-      const fileIdMatch = url_imagen.match(/[?&]id=([^&]+)/);
-      if (fileIdMatch && fileIdMatch[1]) {
-        const fileId = fileIdMatch[1];
-        return `${baseUrl}/image-proxy?fileId=${fileId}`;
-      }
-    }
-    
-    // Si es una ruta relativa o URL completa de otro origen, devolverla tal cual
+    // Si es URL externa, devolverla tal cual
     if (url_imagen.startsWith('http://') || url_imagen.startsWith('https://')) {
       return url_imagen;
     }
@@ -113,11 +81,10 @@ export class ProductosController {
     @UploadedFile() imagen?: Express.Multer.File
   ) {
     if (imagen) {
-      // Subir la imagen a Google Drive y guardar el enlace
-      const url = await this.googleDriveService.uploadFile(
-        imagen.originalname,
-        imagen.mimetype,
-        imagen.buffer
+      // Guardar la imagen localmente
+      const url = await this.localStorageService.uploadFile(
+        imagen.buffer,
+        imagen.originalname
       );
       createProductoDto.url_imagen = url;
     }
@@ -176,11 +143,10 @@ export class ProductosController {
     @Req() req?: Request
   ) {
     if (imagen) {
-      // Subir la imagen a Google Drive y guardar el enlace
-      const url = await this.googleDriveService.uploadFile(
-        imagen.originalname,
-        imagen.mimetype,
-        imagen.buffer
+      // Guardar la imagen localmente
+      const url = await this.localStorageService.uploadFile(
+        imagen.buffer,
+        imagen.originalname
       );
       updateProductoDto.url_imagen = url;
     }
